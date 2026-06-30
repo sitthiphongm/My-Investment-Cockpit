@@ -1,0 +1,56 @@
+@import "tailwindcss";
+
+/* ═══════════════════════════════════════════════════════════════════════════════
+   Dark Trading Dashboard Theme Tokens
+   ═══════════════════════════════════════════════════════════════════════════════ */
+
+@theme {
+  /* Dark Mode (default) */
+  --color-background: #020617;
+  --color-surface: #0F172A;
+  --color-surface-elevated: #111827;
+  --color-border: #1E293B;
+  --color-text-primary: #F8FAFC;
+  --color-text-secondary: #94A3B8;
+  --color-primary: #3B82F6;
+  --color-positive: #22C55E;
+  --color-negative: #EF4444;
+  --color-warning: #F59E0B;
+  --color-info: #38BDF8;
+
+  /* Light Mode overrides */
+  --color-light-background: #F6F8FB;
+  --color-light-surface: #FFFFFF;
+  --color-light-border: #E2E8F0;
+  --color-light-text-primary: #0F172A;
+  --color-light-text-secondary: #64748B;
+  --color-light-primary: #0052FF;
+  --color-light-positive: #16A34A;
+  --color-light-negative: #DC2626;
+
+  /* Typography */
+  --font-sans: 'Inter', 'Geist', system-ui, -apple-system, sans-serif;
+
+  /* Radius */
+  --radius-card: 16px;
+  --radius-button: 10px;
+  --radius-input: 10px;
+  --radius-badge: 999px;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════════
+   Base Styles
+   ═══════════════════════════════════════════════════════════════════════════════ */
+
+#root {
+  min-height: 100vh;
+  width: 100%;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+}

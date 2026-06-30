@@ -1,0 +1,9 @@
+.venv
+.hypothesis
+.pytest_cache
+.kiro
+.vscode
+.git
+node_modules
+__pycache__
+*.pyc

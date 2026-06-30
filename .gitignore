@@ -1,0 +1,136 @@
+# ==========================================
+# 1. Secrets & Environment Variables (CRITICAL)
+# ==========================================
+.env
+.env.local
+.env.*.local
+*.env
+*.secret
+*.pem
+*.key
+
+# ==========================================
+# 2. Python / Backend (FastAPI & Alembic)
+# ==========================================
+__pycache__/
+*.py[cod]
+*$py.class
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Environments
+backend/venv/
+.venv/
+venv/
+ENV/
+env/
+ENV/src
+
+# Inline documentation / Coverage
+backend/htmlcov/
+.toml
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+*.py,cover
+.hypothesis/
+.pytest_cache/
+backend/.pytest_cache/
+
+# ==========================================
+# 3. Frontend (React / Vite / Node)
+# ==========================================
+node_modules/
+frontend/node_modules/
+.npm
+_logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Production build outputs
+frontend/dist/
+frontend/build/
+.cache/
+.vite/
+
+# TypeScript declaration cache
+*.tsbuildinfo
+
+# ==========================================
+# 4. Databases & Caches (Docker / Local)
+# ==========================================
+# Local SQLite or DB dumps (if any)
+*.db
+*.sqlite3
+*.sql
+*.dump
+
+# Docker local data directories (if mapped to host instead of named volumes)
+.docker-data/
+postgres_data/
+redis_data/
+
+# ==========================================
+# 5. OS & IDEs (VS Code, Cursor, JetBrains)
+# ==========================================
+# Windows
+Thumbs.db
+Thumbs.db:encryptable
+ehthumbs.db
+ehthumbs_vista.db
+*.lnk
+Desktop.ini
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+.DocumentRevisions-V100
+.fseventsd
+.Spotlight-V100
+.VolumeIcon.icns
+.com.apple.timemachine.donotbackup
+
+# IDEs
+.idea/
+.vscode/
+!.vscode/settings.json (optional)
+!.vscode/tasks.json (optional)
+!.vscode/launch.json (optional)
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+.cursor/
+
+# ==========================================
+# 6. Investment Data / Backups
+# ==========================================
+# Precautionary rule to avoid committing exported financial records
+*.csv
+*.xlsx
+*backup*.json

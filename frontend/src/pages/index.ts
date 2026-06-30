@@ -1,0 +1,24 @@
+export { default as LoginPage } from './LoginPage';
+export { default as DashboardPage } from './DashboardPage';
+export { default as TradingPage } from './TradingPage';
+export { default as TransfersPage } from './TransfersPage';
+export { default as PortfolioPage } from './PortfolioPage';
+export { default as PerformancePage } from './PerformancePage';
+export { default as JournalPage } from './JournalPage';
+export { default as WatchlistPage } from './WatchlistPage';
+export { default as IdeasPage } from './IdeasPage';
+export { default as AdminPage } from './AdminPage';
+export { default as TrendingPage } from './TrendingPage';
+export { default as HeatmapPage } from './HeatmapPage';
+export { default as ScreenerPage } from './ScreenerPage';
+export { default as RebalancingPage } from './RebalancingPage';
+export { default as AlertsPage } from './AlertsPage';
+export { default as DividendsPage } from './DividendsPage';
+export { default as RealizedPLPage } from './RealizedPLPage';
+// New v2 pages
+export { default as AIInsightsPage } from './AIInsightsPage';
+export { default as BehavioralPage } from './BehavioralPage';
+export { default as ImportExportPage } from './ImportExportPage';
+export { default as SimulatorPage } from './SimulatorPage';
+export { default as SettingsPage } from './SettingsPage';
+export { default as StockDetailPage } from './StockDetailPage';
