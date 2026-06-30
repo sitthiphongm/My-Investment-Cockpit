@@ -480,5 +480,6 @@ When the backend is running, interactive API docs are available at:
 ## License
 
 Private — not for redistribution.
-#   M y - I n v e s t m e n t - C o c k p i t  
- 
+#   M y - I n v e s t m e n t - C o c k p i t 
+ 
+ 
