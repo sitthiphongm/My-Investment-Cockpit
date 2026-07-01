@@ -21,7 +21,7 @@ logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/api/trending", tags=["trending"])
 
-TRENDING_CACHE_KEY = "trending_data_v2"
+TRENDING_CACHE_KEY = "trending_data_v3"
 TRENDING_CACHE_TTL = 900  # 15 minutes
 
 

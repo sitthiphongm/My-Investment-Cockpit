@@ -39,7 +39,7 @@ export default function TrendingPage() {
 
   const stocks = data ? (data[activeTab] || []) : [];
   const { sortedItems, requestSort, getSortIndicator } = useSortableData(stocks);
-  const { paginatedItems, currentPage, totalItems, itemsPerPage, setPage, setPerPage } = usePagination(sortedItems, { defaultPerPage: 20 });
+  const { paginatedItems, currentPage, totalItems, itemsPerPage, setPage, setPerPage } = usePagination(sortedItems, { defaultPerPage: 50 });
 
   if (loading) {
     return (<div className="page trending-page"><h1>Trending Stocks</h1><p className="loading-text">Loading...</p></div>);

@@ -16,7 +16,7 @@ logger = logging.getLogger(__name__)
 
 # Redis key prefixes
 MARKET_DATA_KEY_PREFIX = "market_data:"
-TRENDING_DATA_KEY = "trending_data"
+TRENDING_DATA_KEY = "trending_data_v3"
 
 # yfinance field mappings: yfinance_key -> our_field_name
 YFINANCE_FIELD_MAP = {
@@ -241,10 +241,10 @@ class MarketDataService:
         # Fetch from yfinance
         try:
             trending = await self._fetch_trending_from_yfinance()
-            # Enrich with sector data (top 10 per category to limit API calls)
-            trending.gainers = await self._enrich_sectors(trending.gainers[:15])
-            trending.losers = await self._enrich_sectors(trending.losers[:15])
-            trending.most_active = await self._enrich_sectors(trending.most_active[:15])
+            # Enrich with sector data (cached to limit API calls)
+            trending.gainers = await self._enrich_sectors(trending.gainers[:50])
+            trending.losers = await self._enrich_sectors(trending.losers[:50])
+            trending.most_active = await self._enrich_sectors(trending.most_active[:50])
             # Cache the result
             await self._set_trending_cached(trending)
             return trending
@@ -357,25 +357,25 @@ class MarketDataService:
         errors: list[Exception] = []
 
         try:
-            gainer_data = yf.screen("day_gainers", count=25)
+            gainer_data = yf.screen("day_gainers", count=50)
             if gainer_data and "quotes" in gainer_data:
-                for quote in gainer_data["quotes"][:25]:
+                for quote in gainer_data["quotes"][:50]:
                     gainers.append(self._parse_trending_quote(quote, "gainer"))
         except Exception as e:
             errors.append(e)
 
         try:
-            loser_data = yf.screen("day_losers", count=25)
+            loser_data = yf.screen("day_losers", count=50)
             if loser_data and "quotes" in loser_data:
-                for quote in loser_data["quotes"][:25]:
+                for quote in loser_data["quotes"][:50]:
                     losers.append(self._parse_trending_quote(quote, "loser"))
         except Exception as e:
             errors.append(e)
 
         try:
-            active_data = yf.screen("most_actives", count=25)
+            active_data = yf.screen("most_actives", count=50)
             if active_data and "quotes" in active_data:
-                for quote in active_data["quotes"][:25]:
+                for quote in active_data["quotes"][:50]:
                     most_active.append(self._parse_trending_quote(quote, "most_active"))
         except Exception as e:
             errors.append(e)
