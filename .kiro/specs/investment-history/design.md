@@ -438,7 +438,7 @@ This ensures only tradeable common stocks appear in results.
 
 | Endpoint | Method | Description |
 |----------|--------|-------------|
-| `/api/trending` | GET | Trending, top gainers, top losers, most active (cached 15 min) |
+| `/api/trending` | GET | Top 50 gainers, top 50 losers, top 50 most active (cached 15 min) |
 
 #### 21. Reports Module (`/api/reports/`)
 
@@ -616,7 +616,7 @@ class MarketDataService:
     """Orchestrates provider adapters with caching, fallback, and circuit breaking"""
     async def get_ticker_info(self, symbol: str) -> TickerInfo
     async def refresh_batch(self, symbols: list[str]) -> dict[str, TickerInfo]
-    async def get_trending(self) -> TrendingData
+    async def get_trending(self) -> TrendingData  # Returns 50 items per category (gainers, losers, most_active)
     async def get_fx_rate(self, base: str, quote: str, date: date) -> FXRateResult
     async def get_data_quality_score(self, user_id: UUID) -> DataQualityScore
     async def get_provider_status(self) -> list[ProviderStatus]

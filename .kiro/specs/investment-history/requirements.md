@@ -436,12 +436,14 @@ Trade journal, behavioral analytics, rebalancing, position sizing, risk dashboar
 
 #### Acceptance Criteria
 - THE system SHALL display Trending Stocks, Top Gainers, Top Losers, and Most Active names.
+- THE system SHALL display up to 50 items per category (Gainers, Losers, Most Active).
 - THE system SHALL cache trending data and refresh no more frequently than once per 15 minutes.
 - THE system SHALL allow adding any trending stock to Watchlist or Investment Ideas.
 - THE system SHALL show data source and last refreshed timestamp.
 - THE Trending and Popular Stocks feature MAY be disabled or degraded in MVP when no free provider quota is available.
 - THE system SHALL cache trending data for at least 15 minutes and SHALL NOT repeatedly call external providers within the cache window.
 - THE system SHALL show an unavailable state rather than blocking the rest of the application when trending data cannot be fetched.
+- THE Trending page SHALL default to showing 50 items per page with pagination options (10, 20, 50, 100).
 
 ### Requirement 25: Stock Tags and Categories
 

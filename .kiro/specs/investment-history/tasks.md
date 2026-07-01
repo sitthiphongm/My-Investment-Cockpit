@@ -475,11 +475,14 @@ This implementation plan follows a three-phase approach aligned with the require
 
 - [x] 25. Trending Stocks
   - [x] 25.1 Implement trending stocks service
-    - Create `GET /api/trending` โ€” Trending, Top Gainers, Top Losers, Most Active
-    - Cache trending data for 15 minutes minimum
+    - Create `GET /api/trending` - Top 50 Gainers, Top 50 Losers, Top 50 Most Active
+    - Fetch 50 items per category from yfinance (`yf.screen` with `count=50`)
+    - Enrich all 50 items per category with sector data (cached in Redis)
+    - Cache trending data for 15 minutes minimum (cache key: `trending_data_v3`)
+    - Frontend defaults to 50 items per page with pagination options (10/20/50/100)
     - Show data source and last refreshed timestamp
     - Show unavailable state gracefully when no provider quota available
-    - _Requirements: 24.1, 24.2, 24.3, 24.4, 24.5, 24.6, 24.7_
+    - _Requirements: 24.1, 24.2, 24.3, 24.4, 24.5, 24.6, 24.7, 24.8, 24.9_
 
 - [x] 26. Tags system
   - [x] 26.1 Implement tags service and API
