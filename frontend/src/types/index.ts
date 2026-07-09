@@ -562,6 +562,8 @@ export interface TransactionFilters {
   date_from?: string;
   date_to?: string;
   stock_symbol?: string;
+  // Backend expects `symbol` as query param; keep both for compatibility
+  symbol?: string;
   broker?: string;
   action?: ActionType;
   tag?: string;

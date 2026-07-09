@@ -112,7 +112,8 @@ export default function TradingPage() {
     const newFilters: TransactionFilters = {};
     if (filterDateFrom) newFilters.date_from = filterDateFrom;
     if (filterDateTo) newFilters.date_to = filterDateTo;
-    if (filterSymbol.trim()) newFilters.stock_symbol = filterSymbol.trim().toUpperCase();
+    // send `symbol` query param to match backend router
+    if (filterSymbol.trim()) newFilters.symbol = filterSymbol.trim().toUpperCase();
     if (filterBroker.trim()) newFilters.broker = filterBroker.trim();
     if (filterAction) newFilters.action = filterAction as ActionType;
     setFilters(newFilters);
