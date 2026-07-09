@@ -157,6 +157,27 @@ class TestListTransactions:
             assert filters.stock_symbol == "KBANK"
             assert filters.broker == "Bualuang"
 
+    async def test_list_accepts_stock_symbol_alias(self, user_id, override_auth):
+        """GET /api/transactions should also accept the stock_symbol alias."""
+        with patch(
+            "app.routers.transactions.TradingService"
+        ) as MockService:
+            mock_instance = MockService.return_value
+            mock_instance.list_transactions = AsyncMock(return_value=[])
+
+            transport = ASGITransport(app=app)
+            async with AsyncClient(transport=transport, base_url="http://test") as client:
+                response = await client.get(
+                    "/api/transactions",
+                    params={"stock_symbol": "AAPL", "broker": "Robinhood"},
+                )
+
+            assert response.status_code == 200
+            call_args = mock_instance.list_transactions.call_args
+            filters = call_args[0][1]
+            assert filters.stock_symbol == "AAPL"
+            assert filters.broker == "Robinhood"
+
 
 @pytest.mark.asyncio
 class TestEditTransaction:

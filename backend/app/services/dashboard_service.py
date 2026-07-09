@@ -11,6 +11,7 @@ from app.models.transaction import Transaction
 from app.models.transfer import Transfer
 from app.schemas.dashboard import BrokerCapital, DashboardResponse
 from app.schemas.market_data import TickerInfo
+from app.services.portfolio_service import PortfolioService
 
 
 TWO_PLACES = Decimal("0.01")
@@ -89,8 +90,9 @@ class DashboardService:
         # Calculate avg_cost and total_cost per position
         symbols = list(positions_data.keys())
         total_cost = Decimal("0")
+        portfolio_service = PortfolioService(self.db)
         for symbol, qty in positions_data.items():
-            avg_cost = await self._calculate_avg_cost(user_id, symbol)
+            avg_cost = await portfolio_service.calculate_avg_cost(user_id, symbol)
             position_cost = (avg_cost * Decimal(qty)).quantize(
                 TWO_PLACES, rounding=ROUND_HALF_UP
             )
@@ -268,35 +270,3 @@ class DashboardService:
         rows = result.all()
         return {row.stock_symbol: int(row.holdings) for row in rows}
 
-    async def _calculate_avg_cost(self, user_id: uuid.UUID, symbol: str) -> Decimal:
-        """Calculate weighted average cost for a symbol.
-
-        avg_cost = Σ(quantity_i × price_per_share_i) / Σ(quantity_i)
-        where i ∈ {Buy + Snapshot entries for this symbol}
-
-        Returns Decimal("0") if no buy/snapshot entries exist.
-        """
-        symbol = symbol.upper()
-
-        stmt = select(
-            func.sum(Transaction.quantity * Transaction.price_per_share).label("total_cost"),
-            func.sum(Transaction.quantity).label("total_qty"),
-        ).where(
-            Transaction.user_id == user_id,
-            Transaction.stock_symbol == symbol,
-            Transaction.action.in_(["Buy", "Snapshot"]),
-        )
-
-        result = await self.db.execute(stmt)
-        row = result.one()
-
-        total_cost = row.total_cost
-        total_qty = row.total_qty
-
-        if total_qty is None or total_qty == 0:
-            return Decimal("0.00")
-
-        avg_cost = (Decimal(str(total_cost)) / Decimal(str(total_qty))).quantize(
-            TWO_PLACES, rounding=ROUND_HALF_UP
-        )
-        return avg_cost

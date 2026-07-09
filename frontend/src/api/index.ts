@@ -60,11 +60,19 @@ export const authApi = {
 // ===== Transactions =====
 
 export const transactionsApi = {
-  list: (filters?: TransactionFilters) =>
-    apiClient.get('/api/transactions', { params: filters }).then((r) => {
+  list: (filters?: TransactionFilters) => {
+    const normalizedFilters = { ...filters } as TransactionFilters & Record<string, unknown>;
+    if (normalizedFilters.stock_symbol && !normalizedFilters.symbol) {
+      normalizedFilters.symbol = normalizedFilters.stock_symbol;
+    }
+    if (normalizedFilters.symbol && !normalizedFilters.stock_symbol) {
+      normalizedFilters.stock_symbol = normalizedFilters.symbol;
+    }
+    return apiClient.get('/api/transactions', { params: normalizedFilters }).then((r) => {
       const data = r.data;
       return Array.isArray(data) ? data : data?.transactions ?? data?.records ?? [];
-    }),
+    });
+  },
   create: (data: TransactionCreate) =>
     apiClient.post<Transaction>('/api/transactions', data).then((r) => r.data),
   update: (id: string, data: TransactionUpdate) =>
@@ -72,11 +80,19 @@ export const transactionsApi = {
   delete: (id: string) => apiClient.delete(`/api/transactions/${id}`),
   importSnapshot: (entries: SnapshotEntry[]) =>
     apiClient.post('/api/transactions/snapshot', { entries }).then((r) => r.data),
-  exportExcel: (filters?: TransactionFilters) =>
-    apiClient.get('/api/transactions/export-excel', {
-      params: filters,
+  exportExcel: (filters?: TransactionFilters) => {
+    const normalizedFilters = { ...filters } as TransactionFilters & Record<string, unknown>;
+    if (normalizedFilters.stock_symbol && !normalizedFilters.symbol) {
+      normalizedFilters.symbol = normalizedFilters.stock_symbol;
+    }
+    if (normalizedFilters.symbol && !normalizedFilters.stock_symbol) {
+      normalizedFilters.stock_symbol = normalizedFilters.symbol;
+    }
+    return apiClient.get('/api/transactions/export-excel', {
+      params: normalizedFilters,
       responseType: 'blob',
-    }).then((r) => r.data),
+    }).then((r) => r.data);
+  },
   importExcelPreview: (file: File) => {
     const formData = new FormData();
     formData.append('file', file);

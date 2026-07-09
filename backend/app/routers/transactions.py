@@ -42,6 +42,7 @@ async def list_transactions(
     date_from: Optional[date] = Query(None, description="Filter: start date"),
     date_to: Optional[date] = Query(None, description="Filter: end date"),
     symbol: Optional[str] = Query(None, description="Filter: stock symbol"),
+    stock_symbol: Optional[str] = Query(None, description="Filter: stock symbol alias"),
     broker: Optional[str] = Query(None, description="Filter: broker name"),
     action: Optional[ActionType] = Query(None, description="Filter: action type"),
     tag: Optional[str] = Query(None, description="Filter: tag name"),
@@ -49,10 +50,11 @@ async def list_transactions(
     db: AsyncSession = Depends(get_db),
 ):
     """List transactions with optional filters, including tag filter."""
+    effective_symbol = symbol or stock_symbol
     filters = TransactionFilters(
         date_from=date_from,
         date_to=date_to,
-        stock_symbol=symbol,
+        stock_symbol=effective_symbol,
         broker=broker,
         action=action,
         tag=tag,
@@ -103,16 +105,18 @@ async def export_transactions_excel(
     date_from: Optional[date] = Query(None),
     date_to: Optional[date] = Query(None),
     symbol: Optional[str] = Query(None),
+    stock_symbol: Optional[str] = Query(None),
     broker: Optional[str] = Query(None),
     action: Optional[ActionType] = Query(None),
     user_id: uuid.UUID = Depends(get_current_user_id),
     db: AsyncSession = Depends(get_db),
 ):
     """Export transactions as an Excel (.xlsx) file."""
+    effective_symbol = symbol or stock_symbol
     filters = TransactionFilters(
         date_from=date_from,
         date_to=date_to,
-        stock_symbol=symbol,
+        stock_symbol=effective_symbol,
         broker=broker,
         action=action,
     )

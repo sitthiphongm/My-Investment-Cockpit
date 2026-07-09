@@ -1,8 +1,8 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { apiClient } from '../api';
 import { screenerApi } from '../api';
-import type { ScreenerPreset, ScreenerPresetCreate } from '../types';
-import { formatTHB, formatPercent, toNum } from '../utils/format';
+import type { ScreenerPreset } from '../types';
+import { formatPercent, toNum } from '../utils/format';
 import { useSortableData } from '../hooks/useSortableData';
 import { usePagination } from '../hooks/usePagination';
 import Pagination from '../components/Pagination';
@@ -121,7 +121,8 @@ export default function ScreenerPage() {
   // Add a filter from dropdown
   const addFilter = (meta: FilterMeta) => {
     if (!(meta.key in activeFilters)) {
-      setActiveFilters(prev => ({ ...prev, [meta.key]: meta.min ?? '' }));
+      const initialValue = meta.type === 'select' ? null : meta.type === 'text' ? '' : meta.min ?? '';
+      setActiveFilters(prev => ({ ...prev, [meta.key]: initialValue }));
     }
     setShowFilterDropdown(false);
   };
@@ -137,7 +138,12 @@ export default function ScreenerPage() {
 
   // Update filter value
   const updateFilter = (key: string, value: any) => {
-    setActiveFilters(prev => ({ ...prev, [key]: value === '' ? null : Number(value) }));
+    const normalizedValue = value === ''
+      ? null
+      : typeof value === 'string' && isNaN(Number(value))
+        ? value
+        : Number(value);
+    setActiveFilters(prev => ({ ...prev, [key]: normalizedValue }));
   };
 
   // Save preset
@@ -155,7 +161,8 @@ export default function ScreenerPage() {
   const { paginatedItems, currentPage, totalItems, itemsPerPage, setPage, setPerPage } = usePagination(sortedItems);
 
   // Get active filter keys for display
-  const activeFilterKeys = Object.keys(activeFilters).filter(k => activeFilters[k] != null);
+  // Keep keys that have been added, even if their value is not set yet.
+  const activeFilterKeys = Object.keys(activeFilters);
   const unusedFilters = availableFilters.filter(f => !(f.key in activeFilters));
 
   return (

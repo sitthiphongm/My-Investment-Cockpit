@@ -115,6 +115,22 @@ class TestCalculateAvgCost:
         assert result == Decimal("11.50")
 
     @pytest.mark.asyncio
+    async def test_avg_cost_after_sell_all_and_rebuy(self):
+        """Avg cost should reflect the remaining lot after selling all then rebuying."""
+        db = AsyncMock()
+
+        buy1 = FakeRow(action="Buy", quantity=10, price_per_share=Decimal("10.00"))
+        sell = FakeRow(action="Sell", quantity=10, price_per_share=Decimal("10.00"))
+        buy2 = FakeRow(action="Buy", quantity=10, price_per_share=Decimal("20.00"))
+        db.execute = AsyncMock(return_value=FakeResult([buy1, sell, buy2]))
+
+        market_svc = FakeMarketDataService({})
+        service = PortfolioService(db, market_svc)
+
+        result = await service.calculate_avg_cost(uuid.uuid4(), "JBL")
+        assert result == Decimal("20.00")
+
+    @pytest.mark.asyncio
     async def test_avg_cost_no_entries_returns_zero(self):
         """If no buy/snapshot entries, avg_cost = 0."""
         db = AsyncMock()

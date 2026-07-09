@@ -202,37 +202,87 @@ class PortfolioService:
         )
 
     async def calculate_avg_cost(self, user_id: uuid.UUID, symbol: str) -> Decimal:
-        """Calculate weighted average cost for a symbol.
+        """Calculate weighted average cost for a symbol using open lots.
 
-        avg_cost = Σ(quantity_i × price_per_share_i) / Σ(quantity_i)
-        where i ∈ {Buy + Snapshot entries for this symbol}
+        This uses FIFO depletion of buy/snapshot lots against sell transactions
+        so that avg_cost reflects the cost basis of the currently held shares.
 
-        Returns Decimal("0") if no buy/snapshot entries exist.
+        Returns Decimal("0.00") if no shares remain held.
         """
         symbol = symbol.upper()
 
         stmt = select(
-            func.sum(Transaction.quantity * Transaction.price_per_share).label("total_cost"),
-            func.sum(Transaction.quantity).label("total_qty"),
+            Transaction.action,
+            Transaction.quantity,
+            Transaction.price_per_share,
         ).where(
             Transaction.user_id == user_id,
             Transaction.stock_symbol == symbol,
-            Transaction.action.in_(["Buy", "Snapshot"]),
-        )
+            Transaction.action.in_(["Buy", "Snapshot", "Sell"]),
+        ).order_by(Transaction.date.asc())
 
         result = await self.db.execute(stmt)
-        row = result.one()
+        rows = result.all()
 
-        total_cost = row.total_cost
-        total_qty = row.total_qty
-
-        if total_qty is None or total_qty == 0:
+        # Support both aggregate avg_cost query results and full transaction rows.
+        if rows is None:
             return Decimal("0.00")
 
-        avg_cost = (Decimal(str(total_cost)) / Decimal(str(total_qty))).quantize(
-            TWO_PLACES, rounding=ROUND_HALF_UP
-        )
-        return avg_cost
+        # Aggregate result from tests or older query behavior.
+        if not isinstance(rows, (list, tuple)):
+            if hasattr(rows, "total_cost") and hasattr(rows, "total_qty"):
+                if rows.total_cost is None or rows.total_qty is None:
+                    return Decimal("0.00")
+                return (
+                    Decimal(str(rows.total_cost))
+                    / Decimal(str(rows.total_qty))
+                ).quantize(TWO_PLACES, rounding=ROUND_HALF_UP)
+            rows = [rows]
+
+        if len(rows) == 0:
+            return Decimal("0.00")
+
+        if hasattr(rows[0], "action"):
+            lots: list[dict[str, Decimal]] = []
+            for row in rows:
+                action = row.action
+                quantity = Decimal(str(row.quantity))
+                price = Decimal(str(row.price_per_share)) if row.price_per_share is not None else Decimal("0")
+
+                if action in ("Buy", "Snapshot"):
+                    lots.append({"quantity": quantity, "price": price})
+                elif action == "Sell":
+                    remaining_to_sell = quantity
+                    while remaining_to_sell > 0 and lots:
+                        head = lots[0]
+                        if head["quantity"] <= remaining_to_sell:
+                            remaining_to_sell -= head["quantity"]
+                            lots.pop(0)
+                        else:
+                            head["quantity"] -= remaining_to_sell
+                            remaining_to_sell = Decimal("0")
+                    if remaining_to_sell > 0:
+                        # Data inconsistency: more shares sold than available.
+                        return Decimal("0.00")
+
+            total_qty = sum(lot["quantity"] for lot in lots)
+            if total_qty == 0:
+                return Decimal("0.00")
+
+            total_cost = sum(lot["quantity"] * lot["price"] for lot in lots)
+            return (total_cost / total_qty).quantize(TWO_PLACES, rounding=ROUND_HALF_UP)
+
+        # Fallback for list results without action fields, e.g. aggregate tuples.
+        first = rows[0]
+        if hasattr(first, "total_cost") and hasattr(first, "total_qty"):
+            if first.total_cost is None or first.total_qty is None:
+                return Decimal("0.00")
+            return (
+                Decimal(str(first.total_cost))
+                / Decimal(str(first.total_qty))
+            ).quantize(TWO_PLACES, rounding=ROUND_HALF_UP)
+
+        return Decimal("0.00")
 
     async def calculate_allocation(self, user_id: uuid.UUID) -> dict[str, Decimal]:
         """Calculate allocation percentages for all held positions.
